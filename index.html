@@ -250,13 +250,19 @@
           text: question,
           align: "left",
           color: "#4B0082",
-        }).pos(20, 340, null, null, front);
+        })
+          .pos(50, 390, null, null, front)
+          .sca(1.6);
+        // .transform({ container: front });
 
         let label_answers = new Label({
           text: answers,
           align: "left",
           color: "#4B0082",
-        }).pos(20, 410, null, null, front);
+        })
+          .pos(50, 510, null, null, front)
+          .sca(1.6);
+        // .transform({ container: front });
 
         let label_score = new Label({
           text: "Score: " + score,
