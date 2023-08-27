@@ -19,10 +19,6 @@
         return data;
       }
 
-      function replaceQuotes(str) {
-        return str.replace(/'/g, '"');
-      }
-
       async function generateQuizset(topic) {
         const response = await fetch(
           `https://langchainquizgenerator-ajerni.b4a.run/quiz_topic_json?thema=${encodeURIComponent(
@@ -37,7 +33,11 @@
             body: {},
           }
         )
-          .then((response) => response.json())
+          .then((response) => {
+            response.json();
+            zog("reached to here...");
+            waiter.hide(); //TODO: get rid of waiter see below as well...
+          })
           .then((data) => console.log(data))
           .catch((error) => console.error(error));
       }
@@ -122,18 +122,23 @@
           align: "left",
         }).pos(110, 170, RIGHT, null, front);
 
+        const waiter = new Waiter(front);
+
         function showChanges() {
           label_topic.text = "New topic received!";
           label_topic.color = "green";
           input.text = "";
           labes_topic.mov(80, 0);
-          // S.update();
+          waiter.hide(front);
+          waiter.removeFrom(front);
+          S.update();
         }
 
         new Button(385, 60, "generate new topic")
           .pos(110, 250, RIGHT, null, front)
           .tap(async () => {
             zog(input.text);
+            waiter.show();
             await generateQuizset(input.text);
             showChanges();
           });
@@ -156,7 +161,8 @@
 
             message_nr = themen_nr_input.currentValue - 1; // increase diffeentls 0-x (message sind die ganzen sets)
             frage_nr = frage_nr_input.currentValue - 1; // increase differntly 0-x (frage ist die einzelne set_nr)
-            const quizzes = await fetchQuizzesStartingWith("json_quiz");
+            const quizzes = await fetchQuizzesStartingWith("json_quiz"); //liest alles aus von Redis, was mit "json_quiz" beginnt.
+            //zog(JSON.stringify(quizzes));
 
             let selected_quizset =
               quizzes["messages"][message_nr]["Value"]["quizset"];
