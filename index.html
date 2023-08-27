@@ -109,7 +109,7 @@
 
         //part for new topic to be generated on FastAPI
         let label_topic = new Label({
-          text: "Press 't' to enter",
+          text: "Enter new topic:",
           align: "right",
           color: "#9B3F9B",
         }).pos(240, 120, RIGHT, null, front);
@@ -117,17 +117,33 @@
         const input = new TextInput({
           width: 385,
           height: 60,
-          placeholder: "new topic here",
+          placeholder: "...type here...",
           size: 36,
           align: "left",
         }).pos(110, 170, RIGHT, null, front);
+
+        function showChanges() {
+          label_topic.text = "New topic received!";
+          label_topic.color = "green";
+          input.text = "";
+          labes_topic.mov(80, 0);
+          // S.update();
+        }
 
         new Button(385, 60, "generate new topic")
           .pos(110, 250, RIGHT, null, front)
           .tap(async () => {
             zog(input.text);
             await generateQuizset(input.text);
+            showChanges();
           });
+
+        input.on("focus", () => {
+          label_topic.text = "Enter new topic:";
+          label_topic.color = "#9B3F9B";
+        });
+
+        //part for new question to be generated on FastAPI")
 
         //part to fetch questions from Redis
         new Button(385, 60, "GET QUESTIONS", "#4169E1")
@@ -168,7 +184,7 @@
 
             label_answers.text = result_answers_strings;
 
-            let xpos = -200;
+            let xpos = -125;
 
             // Remove any previous correction labels before creating new ones
             prevCorrLabels.forEach((label) => {
@@ -208,7 +224,7 @@
                       bold: true,
                       size: 46,
                     });
-                    corrLabel.pos(760, -444, LEFT, CENTER, front);
+                    corrLabel.pos(760, 130, LEFT, BOTTOM, front);
                     score += 1;
                     label_score.text = "Score: " + score;
                     S.update();
@@ -223,7 +239,7 @@
                       bold: true,
                       size: 46,
                     });
-                    corrLabel.pos(760, -444, LEFT, CENTER, front);
+                    corrLabel.pos(800, 130, LEFT, BOTTOM, front);
                     S.update();
                     prevCorrLabels.push(corrLabel);
                   }
