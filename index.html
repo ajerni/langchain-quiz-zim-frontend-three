@@ -35,8 +35,6 @@
         )
           .then((response) => {
             response.json();
-            zog("reached to here...");
-            // waiter.hide(); //TODO: get rid of waiter see below as well...
           })
           .then((data) => console.log(data))
           .catch((error) => console.error(error));
@@ -123,31 +121,33 @@
           align: "left",
         }).pos(110, 170, RIGHT, null, front);
 
-        //const waiter = new Waiter(front);
+        // const waiter = new Waiter(front);
 
         function showChanges() {
-          label_topic.text = "New topic received!";
+          label_topic.text = "New topic generated!";
           label_topic.color = "green";
           input.text = "";
-          labes_topic.mov(80, 0);
+          label_topic.mov(90, 0);
           // waiter.hide(front);
-          // waiter.removeFrom(front);
           S.update();
-          my_main(); //TODO: reaload nach new genaration läuft noch nicht...
+          my_main();
         }
 
         new Button(385, 60, "generate new topic")
           .pos(110, 250, RIGHT, null, front)
           .tap(async () => {
             zog(input.text);
-            //waiter.show();
-            label_topic.text = "...AI generating...";
+            // waiter.show();
+            label_topic.text = "AI generating...";
+            label_topic.color = red;
             await generateQuizset(input.text);
             showChanges();
           });
 
         input.on("focus", () => {
           label_topic.text = "Enter new topic:";
+          label_topic.pos(240, 120, RIGHT, null, front);
+          // label_topic.mov(0, 0);
           label_topic.color = "#9B3F9B";
         });
 
