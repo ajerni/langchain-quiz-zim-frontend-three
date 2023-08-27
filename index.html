@@ -23,22 +23,16 @@
         return str.replace(/'/g, '"');
       }
 
-      function formatNumbers(str) {
-        return str.replace(/(?<![\d])[1-9](?!\w)/g, function (match) {
-          return `'${match}'`;
-        });
-      }
-
       async function generateQuizset(topic) {
         const response = await fetch(
-          `https://langchainquizgenerator-ajerni.b4a.run/quiz_topic?thema=${encodeURIComponent(
+          `https://langchainquizgenerator-ajerni.b4a.run/quiz_topic_json?thema=${encodeURIComponent(
             topic
           )}`,
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              // "Access-Control-Allow-Origin": "*",
+              accept: "application/json",
             },
             body: {},
           }
@@ -78,6 +72,11 @@
         }).addTo();
 
         // front content here:
+        let themen_name_label = new Label({
+          text: "Selected: ", //TODO: das label platzieren...
+          color: "#9A3C99",
+        }).pos(430, 103, null, null, front);
+
         let themen_nr_label = new Label({
           text: "Topic:",
           color: "#9A3C99",
@@ -141,33 +140,24 @@
 
             message_nr = themen_nr_input.currentValue - 1; // increase diffeentls 0-x (message sind die ganzen sets)
             frage_nr = frage_nr_input.currentValue - 1; // increase differntly 0-x (frage ist die einzelne set_nr)
-            const quizzes = await fetchQuizzesStartingWith("quiz");
-            console.log(quizzes);
+            const quizzes = await fetchQuizzesStartingWith("json_quiz");
 
-            let formated = formatNumbers(
-              quizzes["messages"][message_nr]["Value"]
-            );
+            let selected_quizset =
+              quizzes["messages"][message_nr]["Value"]["quizset"];
 
-            console.log(replaceQuotes(formated));
+            //das quizset selber ist wiederum ein JSON objekt und muss deshalb geparsed werden:
+            let parsed_quiz = JSON.parse(selected_quizset);
+            question = parsed_quiz[frage_nr]["question"];
 
-            let selected_set = JSON.parse(replaceQuotes(formated));
-
-            console.log(selected_set[frage_nr].question);
-            console.log(selected_set[frage_nr].answers);
-            console.log(selected_set[frage_nr].correct_answer);
-            console.log(
-              selected_set[frage_nr].answers[
-                selected_set[frage_nr].correct_answer
-              ]
-            );
-
-            question = selected_set[frage_nr].question;
-            answers = selected_set[frage_nr].answers;
-            correct_answer = selected_set[frage_nr].correct_answer;
+            answers = parsed_quiz[frage_nr]["answers"];
+            correct_answer = parsed_quiz[frage_nr]["correct_answer"];
             correct_answer_text =
-              selected_set[frage_nr].answers[
-                selected_set[frage_nr].correct_answer
+              parsed_quiz[frage_nr]["answers"][
+                parsed_quiz[frage_nr]["correct_answer"]
               ];
+            let thema = quizzes["messages"][message_nr]["Value"]["topic"]; //ist eine Stufe höher im ersten JSON
+            themen_name_label.text = "Selected: " + thema;
+
             label_question.text = question;
 
             let result_answers_strings = "";
@@ -338,11 +328,6 @@
           0,
           1000
         );
-
-        // can capture raydown, raymove, rayup, rayover and rayout
-        textureActives.on("raymove", (e) => {
-          // zog(e.intersect.distance);
-        });
 
         // const canvasWindow = three.makePanel(front, textureActives, null, -50);
         const canvasWindow = three.makePanel(front, textureActives, null, 0);
