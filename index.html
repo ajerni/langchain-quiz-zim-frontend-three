@@ -74,7 +74,7 @@
         // front content here:
         let themen_name_label = new Label({
           text: "Loaded: ", //TODO: das label platzieren...
-          color: "#9A3C99",
+          color: "#4B0082",
         }).pos(430, 103, null, null, front);
 
         let themen_nr_label = new Label({
@@ -215,25 +215,28 @@
               align: "left", // if aligned right indent should be 0 and labelIndent 10 (for center it does not matter)
               indent: 10, // otherwise when custom object is added the list takes on an outer indent
               labelIndent: 10, // if we do not want an outer indent we set it to 0 and but then need a labelIndent
-              borderColor: light,
+              borderColor: "#4169E1",
               viewNum: 8,
               corner: 10,
               list: list_topics_numbered,
               titleBar: "Topics",
-              titleBarBackgroundColor: light,
+              titleBarBackgroundColor: "#9B3F9B",
+              titleBarColor: white,
               scrollBarActive: true,
               close: true,
               currentSelected: true,
+              backgroundColor: "#4169E1",
+              rollBackgroundColor: "#4169E1".toAlpha(0.8),
+              selectedBackgroundColor: "#4B0082",
+              closeColor: white,
+
               // boundary: new Boundary(5, 5, W - 215, H - 400 - 70), // height of List and other list
             })
               .pos(285, 455, RIGHT, TOP, front)
               .sca(1.8)
               .change(function (e) {
                 prevTopicLists.push(list);
-                // zog(e.target.text);
                 zog(e.target.selectedIndex);
-                // list1.selectedIndex = e.target.selectedIndex; // no movement
-                // list1.selectedIndexPlusPosition = e.target.selectedIndex; // directly to middl
               });
 
             themen_nr_input.on("change", () => {
