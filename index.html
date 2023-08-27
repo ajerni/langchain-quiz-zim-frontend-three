@@ -72,58 +72,6 @@
         }).addTo();
 
         // front content here:
-        // let listOfTopics = await getAllToppics();
-        // zog(listOfTopics);
-
-        // Acordeon data:
-        // var accordionData = {
-        //   menu: {
-        //     Topics: listOfTopics,
-        //   },
-        //   subStyles: [
-        //     {
-        //       backgroundColor: red,
-        //       color: white,
-        //       rollBackgroundColor: purple,
-        //       rollColor: white,
-        //       selectedBackgroundColor: white,
-        //       selectedColor: red,
-        //       selectedRollBackgroundColor: purple,
-        //       selectedRollColor: white,
-        //     },
-        //   ],
-        // };
-
-        //List of topisc:
-        // var list = new List({
-        //   list: accordionData,
-        //   titleBar: false,
-        //   titleBarBackgroundColor: orange,
-        //   titleBarColor: white,
-        //   titleBarHeight: 40,
-        //   scrollBarActive: true,
-        //   currentSelected: false,
-        //   indent: 20,
-        //   height: 250,
-        //   viewNum: 3,
-        //   boundary: new Boundary(0, 0, W - 200, H - 200),
-        //   borderWidth: -1,
-        //   shadowBlur: -1,
-        //   // backdropColor: F.color,
-        //   // align:center,
-        //   // backgroundColor:red,
-        //   // color:black,
-        //   // rollBackgroundColor:brown,
-        //   // rollColor:black,
-        //   // selectedBackgroundColor:black,
-        //   // selectedColor:white,
-        //   // selectedRollBackgroundColor:blue,
-        //   // selectedRollColor:yellow
-        // }).pos(750, 90, null, null, front);
-        // list.selectedIndex = -1;
-
-        //Ende Liste
-
         let themen_name_label = new Label({
           text: "Loaded: ", //TODO: das label platzieren...
           color: "#9A3C99",
@@ -158,6 +106,7 @@
         }).pos(230, 164, null, null, front);
 
         let prevCorrLabels = [];
+        let prevTopicLists = [];
 
         //part for new topic to be generated on FastAPI
         let label_topic = new Label({
@@ -200,12 +149,16 @@
           label_topic.color = "#9B3F9B";
         });
 
-        //part for new question to be generated on FastAPI")
-
         //part to fetch questions from Redis
         new Button(785, 60, "Load Questions", "#4169E1")
           .pos(20, 250, null, null, front)
           .tap(async () => {
+            prevTopicLists.forEach((list) => {
+              list.removeFrom(S.front);
+            });
+
+            prevTopicLists = [];
+
             prevCorrLabels.forEach((label) => {
               label.removeFrom(S.front);
             });
@@ -273,8 +226,10 @@
               currentSelected: true,
               // boundary: new Boundary(5, 5, W - 215, H - 400 - 70), // height of List and other list
             })
-              .pos(0, 100, CENTER, TOP, front)
+              .pos(285, 455, RIGHT, TOP, front)
+              .sca(1.8)
               .change(function (e) {
+                prevTopicLists.push(list);
                 // zog(e.target.text);
                 zog(e.target.selectedIndex);
                 // list1.selectedIndex = e.target.selectedIndex; // no movement
@@ -368,6 +323,8 @@
 
               xpos += 150;
             }
+
+            list.selectedIndex = themen_nr_input.currentValue - 1;
 
             S.update();
           });
