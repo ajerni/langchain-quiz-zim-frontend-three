@@ -62,7 +62,7 @@
         "assets/"
       );
 
-      function ready() {
+      async function ready() {
         const front = new TextureActive({
           width: W,
           height: H,
@@ -72,8 +72,60 @@
         }).addTo();
 
         // front content here:
+        // let listOfTopics = await getAllToppics();
+        // zog(listOfTopics);
+
+        // Acordeon data:
+        // var accordionData = {
+        //   menu: {
+        //     Topics: listOfTopics,
+        //   },
+        //   subStyles: [
+        //     {
+        //       backgroundColor: red,
+        //       color: white,
+        //       rollBackgroundColor: purple,
+        //       rollColor: white,
+        //       selectedBackgroundColor: white,
+        //       selectedColor: red,
+        //       selectedRollBackgroundColor: purple,
+        //       selectedRollColor: white,
+        //     },
+        //   ],
+        // };
+
+        //List of topisc:
+        // var list = new List({
+        //   list: accordionData,
+        //   titleBar: false,
+        //   titleBarBackgroundColor: orange,
+        //   titleBarColor: white,
+        //   titleBarHeight: 40,
+        //   scrollBarActive: true,
+        //   currentSelected: false,
+        //   indent: 20,
+        //   height: 250,
+        //   viewNum: 3,
+        //   boundary: new Boundary(0, 0, W - 200, H - 200),
+        //   borderWidth: -1,
+        //   shadowBlur: -1,
+        //   // backdropColor: F.color,
+        //   // align:center,
+        //   // backgroundColor:red,
+        //   // color:black,
+        //   // rollBackgroundColor:brown,
+        //   // rollColor:black,
+        //   // selectedBackgroundColor:black,
+        //   // selectedColor:white,
+        //   // selectedRollBackgroundColor:blue,
+        //   // selectedRollColor:yellow
+        // }).pos(750, 90, null, null, front);
+        // list.selectedIndex = -1;
+
+        //Ende Liste
+
         let themen_name_label = new Label({
-          text: "Selected: ", //TODO: das label platzieren...
+          text: "Loaded: ", //TODO: das label platzieren...
           color: "#9A3C99",
         }).pos(430, 103, null, null, front);
 
@@ -151,7 +203,7 @@
         //part for new question to be generated on FastAPI")
 
         //part to fetch questions from Redis
-        new Button(385, 60, "GET QUESTIONS", "#4169E1")
+        new Button(785, 60, "Load Questions", "#4169E1")
           .pos(20, 250, null, null, front)
           .tap(async () => {
             prevCorrLabels.forEach((label) => {
@@ -178,8 +230,70 @@
                 parsed_quiz[frage_nr]["correct_answer"]
               ];
             let thema = quizzes["messages"][message_nr]["Value"]["topic"]; //ist eine Stufe höher im ersten JSON
-            themen_name_label.text = "Selected: " + thema;
+            themen_name_label.text = "Loaded: " + thema;
 
+            function getAllTopics() {
+              const messages = quizzes["messages"];
+              const topics = [];
+
+              for (let messageNr in messages) {
+                const message = messages[messageNr];
+                if (message && message["Value"]) {
+                  topics.push(message["Value"]["topic"]);
+                }
+              }
+
+              return topics;
+            }
+
+            const list_topics = getAllTopics();
+            zog(getAllTopics());
+
+            const list_topics_numbered = [];
+
+            for (let i = 0; i < list_topics.length; i++) {
+              list_topics_numbered.push(`${i + 1}) ${list_topics[i]}`);
+            }
+
+            //List of all topics:
+            var list = new List({
+              width: 200,
+              height: 400,
+              align: "left", // if aligned right indent should be 0 and labelIndent 10 (for center it does not matter)
+              indent: 10, // otherwise when custom object is added the list takes on an outer indent
+              labelIndent: 10, // if we do not want an outer indent we set it to 0 and but then need a labelIndent
+              borderColor: light,
+              viewNum: 8,
+              corner: 10,
+              list: list_topics_numbered,
+              titleBar: "Topics",
+              titleBarBackgroundColor: light,
+              scrollBarActive: true,
+              close: true,
+              currentSelected: true,
+              // boundary: new Boundary(5, 5, W - 215, H - 400 - 70), // height of List and other list
+            })
+              .pos(0, 100, CENTER, TOP, front)
+              .change(function (e) {
+                // zog(e.target.text);
+                zog(e.target.selectedIndex);
+                // list1.selectedIndex = e.target.selectedIndex; // no movement
+                // list1.selectedIndexPlusPosition = e.target.selectedIndex; // directly to middl
+              });
+
+            themen_nr_input.on("change", () => {
+              zog("Topic Nr. changed...");
+              list.selectedIndex = themen_nr_input.currentValue - 1;
+              S.update();
+            });
+
+            list.on("change", () => {
+              zog("List index changed...");
+              themen_nr_input.currentValue = list.selectedIndex + 1;
+              S.update();
+            });
+
+            //main labesl etc.
             label_question.text = question;
 
             let result_answers_strings = "";
