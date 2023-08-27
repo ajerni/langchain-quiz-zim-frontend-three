@@ -36,7 +36,7 @@
           .then((response) => {
             response.json();
             zog("reached to here...");
-            waiter.hide(); //TODO: get rid of waiter see below as well...
+            // waiter.hide(); //TODO: get rid of waiter see below as well...
           })
           .then((data) => console.log(data))
           .catch((error) => console.error(error));
@@ -123,23 +123,25 @@
           align: "left",
         }).pos(110, 170, RIGHT, null, front);
 
-        const waiter = new Waiter(front);
+        //const waiter = new Waiter(front);
 
         function showChanges() {
           label_topic.text = "New topic received!";
           label_topic.color = "green";
           input.text = "";
           labes_topic.mov(80, 0);
-          waiter.hide(front);
-          waiter.removeFrom(front);
+          // waiter.hide(front);
+          // waiter.removeFrom(front);
           S.update();
+          my_main();
         }
 
         new Button(385, 60, "generate new topic")
           .pos(110, 250, RIGHT, null, front)
           .tap(async () => {
             zog(input.text);
-            waiter.show();
+            //waiter.show();
+            label_topic.text = "...AI generating...";
             await generateQuizset(input.text);
             showChanges();
           });
@@ -149,188 +151,194 @@
           label_topic.color = "#9B3F9B";
         });
 
+        async function my_main() {
+          prevTopicLists.forEach((list) => {
+            list.removeFrom(S.front);
+          });
+
+          prevTopicLists = [];
+
+          prevCorrLabels.forEach((label) => {
+            label.removeFrom(S.front);
+          });
+          prevCorrLabels = [];
+
+          message_nr = themen_nr_input.currentValue - 1; // increase diffeentls 0-x (message sind die ganzen sets)
+          frage_nr = frage_nr_input.currentValue - 1; // increase differntly 0-x (frage ist die einzelne set_nr)
+          const quizzes = await fetchQuizzesStartingWith("json_quiz"); //liest alles aus von Redis, was mit "json_quiz" beginnt.
+          //zog(JSON.stringify(quizzes));
+
+          let selected_quizset =
+            quizzes["messages"][message_nr]["Value"]["quizset"];
+
+          //das quizset selber ist wiederum ein JSON objekt und muss deshalb geparsed werden:
+          let parsed_quiz = JSON.parse(selected_quizset);
+          question = parsed_quiz[frage_nr]["question"];
+
+          answers = parsed_quiz[frage_nr]["answers"];
+          correct_answer = parsed_quiz[frage_nr]["correct_answer"];
+          correct_answer_text =
+            parsed_quiz[frage_nr]["answers"][
+              parsed_quiz[frage_nr]["correct_answer"]
+            ];
+          let thema = quizzes["messages"][message_nr]["Value"]["topic"]; //ist eine Stufe höher im ersten JSON
+          themen_name_label.text = "Loaded: " + thema;
+
+          function getAllTopics() {
+            const messages = quizzes["messages"];
+            const topics = [];
+
+            for (let messageNr in messages) {
+              const message = messages[messageNr];
+              if (message && message["Value"]) {
+                topics.push(message["Value"]["topic"]);
+              }
+            }
+
+            return topics;
+          }
+
+          const list_topics = getAllTopics();
+          zog(getAllTopics());
+
+          const list_topics_numbered = [];
+
+          for (let i = 0; i < list_topics.length; i++) {
+            list_topics_numbered.push(`${i + 1}) ${list_topics[i]}`);
+          }
+
+          //List of all topics:
+          var list = new List({
+            width: 200,
+            height: 400,
+            align: "left", // if aligned right indent should be 0 and labelIndent 10 (for center it does not matter)
+            indent: 10, // otherwise when custom object is added the list takes on an outer indent
+            labelIndent: 10, // if we do not want an outer indent we set it to 0 and but then need a labelIndent
+            borderColor: "#4169E1",
+            viewNum: 8,
+            corner: 10,
+            list: list_topics_numbered,
+            titleBar: "Load Topics",
+            titleBarBackgroundColor: "#9B3F9B",
+            titleBarColor: white,
+            scrollBarActive: true,
+            close: true,
+            currentSelected: true,
+            backgroundColor: "#4169E1",
+            rollBackgroundColor: "#4169E1".toAlpha(0.8),
+            selectedBackgroundColor: "#4B0082",
+            closeColor: white,
+
+            // boundary: new Boundary(5, 5, W - 215, H - 400 - 70), // height of List and other list
+          })
+            .pos(285, 455, RIGHT, TOP, front)
+            .sca(1.8)
+            .change(function (e) {
+              prevTopicLists.push(list);
+              zog(e.target.selectedIndex);
+            });
+
+          themen_nr_input.on("change", () => {
+            zog("Topic Nr. changed...");
+            list.selectedIndex = themen_nr_input.currentValue - 1;
+            themen_name_label.text = "...loading...";
+            S.update();
+            my_main();
+          });
+
+          list.on("change", () => {
+            zog("List index changed...");
+            themen_nr_input.currentValue = list.selectedIndex + 1;
+            themen_name_label.text = "...loading...";
+            S.update();
+            my_main();
+          });
+
+          //main labesl etc.
+          label_question.text = question;
+
+          let result_answers_strings = "";
+
+          for (let key in answers) {
+            result_answers_strings += `${key}) ${answers[key]} \n`;
+          }
+
+          label_answers.text = result_answers_strings;
+
+          let xpos = -125;
+
+          // Remove any previous correction labels before creating new ones
+          prevCorrLabels.forEach((label) => {
+            label.removeFrom(S);
+          });
+          prevCorrLabels = [];
+
+          for (let key in answers) {
+            // Create a new label for the current answer
+            let answerLabel = new Label({
+              text: `${key}`,
+              color: "white",
+              bold: true,
+              backgroundColor: "#4B0082",
+              size: 80,
+            }).hov("#6AB04D");
+            answerLabel.center(front).mov(xpos, 260);
+
+            // Add a tap event listener to the label
+            answerLabel.expand().tap({
+              once: true,
+              call: () => {
+                // Remove any previous correction labels
+                prevCorrLabels.forEach((label) => {
+                  label.removeFrom(S.front);
+                });
+                prevCorrLabels = [];
+
+                // Check if the label is correct
+                if (key === correct_answer) {
+                  zog("Richtig!");
+
+                  // Create a new correction label
+                  let corrLabel = new Label({
+                    text: "C O R R E C T  !",
+                    color: "#3eaf1f",
+                    bold: true,
+                    size: 46,
+                  });
+                  corrLabel.pos(760, 130, LEFT, BOTTOM, front);
+                  score += 1;
+                  label_score.text = "Score: " + score;
+                  S.update();
+                  prevCorrLabels.push(corrLabel);
+                } else {
+                  zog("Falsch!");
+
+                  // Create a new correction label
+                  let corrLabel = new Label({
+                    text: "W R O N G  !",
+                    color: red,
+                    bold: true,
+                    size: 46,
+                  });
+                  corrLabel.pos(800, 130, LEFT, BOTTOM, front);
+                  S.update();
+                  prevCorrLabels.push(corrLabel);
+                }
+              },
+            });
+
+            xpos += 150;
+          }
+
+          list.selectedIndex = themen_nr_input.currentValue - 1;
+
+          S.update();
+        }
+
         //part to fetch questions from Redis
         new Button(785, 60, "Load Questions", "#4169E1")
           .pos(20, 250, null, null, front)
-          .tap(async () => {
-            prevTopicLists.forEach((list) => {
-              list.removeFrom(S.front);
-            });
-
-            prevTopicLists = [];
-
-            prevCorrLabels.forEach((label) => {
-              label.removeFrom(S.front);
-            });
-            prevCorrLabels = [];
-
-            message_nr = themen_nr_input.currentValue - 1; // increase diffeentls 0-x (message sind die ganzen sets)
-            frage_nr = frage_nr_input.currentValue - 1; // increase differntly 0-x (frage ist die einzelne set_nr)
-            const quizzes = await fetchQuizzesStartingWith("json_quiz"); //liest alles aus von Redis, was mit "json_quiz" beginnt.
-            //zog(JSON.stringify(quizzes));
-
-            let selected_quizset =
-              quizzes["messages"][message_nr]["Value"]["quizset"];
-
-            //das quizset selber ist wiederum ein JSON objekt und muss deshalb geparsed werden:
-            let parsed_quiz = JSON.parse(selected_quizset);
-            question = parsed_quiz[frage_nr]["question"];
-
-            answers = parsed_quiz[frage_nr]["answers"];
-            correct_answer = parsed_quiz[frage_nr]["correct_answer"];
-            correct_answer_text =
-              parsed_quiz[frage_nr]["answers"][
-                parsed_quiz[frage_nr]["correct_answer"]
-              ];
-            let thema = quizzes["messages"][message_nr]["Value"]["topic"]; //ist eine Stufe höher im ersten JSON
-            themen_name_label.text = "Loaded: " + thema;
-
-            function getAllTopics() {
-              const messages = quizzes["messages"];
-              const topics = [];
-
-              for (let messageNr in messages) {
-                const message = messages[messageNr];
-                if (message && message["Value"]) {
-                  topics.push(message["Value"]["topic"]);
-                }
-              }
-
-              return topics;
-            }
-
-            const list_topics = getAllTopics();
-            zog(getAllTopics());
-
-            const list_topics_numbered = [];
-
-            for (let i = 0; i < list_topics.length; i++) {
-              list_topics_numbered.push(`${i + 1}) ${list_topics[i]}`);
-            }
-
-            //List of all topics:
-            var list = new List({
-              width: 200,
-              height: 400,
-              align: "left", // if aligned right indent should be 0 and labelIndent 10 (for center it does not matter)
-              indent: 10, // otherwise when custom object is added the list takes on an outer indent
-              labelIndent: 10, // if we do not want an outer indent we set it to 0 and but then need a labelIndent
-              borderColor: "#4169E1",
-              viewNum: 8,
-              corner: 10,
-              list: list_topics_numbered,
-              titleBar: "Topics",
-              titleBarBackgroundColor: "#9B3F9B",
-              titleBarColor: white,
-              scrollBarActive: true,
-              close: true,
-              currentSelected: true,
-              backgroundColor: "#4169E1",
-              rollBackgroundColor: "#4169E1".toAlpha(0.8),
-              selectedBackgroundColor: "#4B0082",
-              closeColor: white,
-
-              // boundary: new Boundary(5, 5, W - 215, H - 400 - 70), // height of List and other list
-            })
-              .pos(285, 455, RIGHT, TOP, front)
-              .sca(1.8)
-              .change(function (e) {
-                prevTopicLists.push(list);
-                zog(e.target.selectedIndex);
-              });
-
-            themen_nr_input.on("change", () => {
-              zog("Topic Nr. changed...");
-              list.selectedIndex = themen_nr_input.currentValue - 1;
-              S.update();
-            });
-
-            list.on("change", () => {
-              zog("List index changed...");
-              themen_nr_input.currentValue = list.selectedIndex + 1;
-              S.update();
-            });
-
-            //main labesl etc.
-            label_question.text = question;
-
-            let result_answers_strings = "";
-
-            for (let key in answers) {
-              result_answers_strings += `${key}) ${answers[key]} \n`;
-            }
-
-            label_answers.text = result_answers_strings;
-
-            let xpos = -125;
-
-            // Remove any previous correction labels before creating new ones
-            prevCorrLabels.forEach((label) => {
-              label.removeFrom(S);
-            });
-            prevCorrLabels = [];
-
-            for (let key in answers) {
-              // Create a new label for the current answer
-              let answerLabel = new Label({
-                text: `${key}`,
-                color: "white",
-                bold: true,
-                backgroundColor: "#4B0082",
-                size: 80,
-              }).hov("#6AB04D");
-              answerLabel.center(front).mov(xpos, 260);
-
-              // Add a tap event listener to the label
-              answerLabel.expand().tap({
-                once: true,
-                call: () => {
-                  // Remove any previous correction labels
-                  prevCorrLabels.forEach((label) => {
-                    label.removeFrom(S.front);
-                  });
-                  prevCorrLabels = [];
-
-                  // Check if the label is correct
-                  if (key === correct_answer) {
-                    zog("Richtig!");
-
-                    // Create a new correction label
-                    let corrLabel = new Label({
-                      text: "C O R R E C T  !",
-                      color: "#3eaf1f",
-                      bold: true,
-                      size: 46,
-                    });
-                    corrLabel.pos(760, 130, LEFT, BOTTOM, front);
-                    score += 1;
-                    label_score.text = "Score: " + score;
-                    S.update();
-                    prevCorrLabels.push(corrLabel);
-                  } else {
-                    zog("Falsch!");
-
-                    // Create a new correction label
-                    let corrLabel = new Label({
-                      text: "W R O N G  !",
-                      color: red,
-                      bold: true,
-                      size: 46,
-                    });
-                    corrLabel.pos(800, 130, LEFT, BOTTOM, front);
-                    S.update();
-                    prevCorrLabels.push(corrLabel);
-                  }
-                },
-              });
-
-              xpos += 150;
-            }
-
-            list.selectedIndex = themen_nr_input.currentValue - 1;
-
-            S.update();
-          });
+          .tap(my_main);
 
         let label_question = new Label({
           text: question,
