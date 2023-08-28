@@ -234,9 +234,11 @@
             .pos(285, 455, RIGHT, TOP, front)
             .sca(1.8)
             .change(function (e) {
-              prevTopicLists.push(list);
+              // prevTopicLists.push(list);
               zog(e.target.selectedIndex);
             });
+
+          prevTopicLists.push(list);
 
           themen_nr_input.on("change", () => {
             zog("Topic Nr. changed...");
