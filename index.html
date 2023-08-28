@@ -70,7 +70,7 @@
         const front = new TextureActive({
           width: W,
           height: H,
-          color: white.toAlpha(0.8),
+          color: black.toAlpha(0.8),
           corner: 20,
           // backingOrbit:false // if not wanting to orbitControl on backing
         }).addTo();
@@ -78,7 +78,7 @@
         // front content here:
         let themen_name_label = new Label({
           text: "",
-          color: "#4B0082",
+          color: white, //"#4B0082",
         }).pos(430, 103, null, null, front);
 
         let themen_nr_label = new Label({
@@ -349,14 +349,15 @@
         }
 
         //part to fetch questions from Redis
-        new Button(785, 60, "Load Questions", "#4169E1")
+        //width, height, label, backgroundColor, rollBackgroundColor, downBackgroundColor, color, rollColor, downColor, borderColor, borderWidth
+        new Button(690, 60, "Load Questions", "#4169E1")
           .pos(20, 250, null, null, front)
           .tap(my_main);
 
         let label_question = new Label({
           text: question,
           align: "left",
-          color: "#4B0082",
+          color: "#4169E1",
         })
           .pos(50, 390, null, null, front)
           .sca(1.4);
@@ -365,7 +366,7 @@
         let label_answers = new Label({
           text: answers,
           align: "left",
-          color: "#4B0082",
+          color: "#4169E1",
         })
           .pos(50, 510, null, null, front)
           .sca(1.4);
@@ -374,15 +375,17 @@
         let label_score = new Label({
           text: "Score: " + score,
           align: "center",
-          color: "#4B0082",
+          color: "#4169E1",
           size: 36,
           bold: true,
-        }).pos(20, 27, "center", null, front);
+        })
+          .pos(20, 27, "center", null, front)
+          .sca(1.2);
 
         let label_title = new Label({
           text: "A I   Q U I Z   G E N E R A T O R",
           align: "left",
-          color: "white",
+          color: new GradientColor(["#4169E1", "#9A3C99"], 45),
           bold: true,
           size: 48,
           outlineColor: "#4169E1",
