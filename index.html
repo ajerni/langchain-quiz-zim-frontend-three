@@ -49,6 +49,8 @@
 
       let score = 0;
 
+      const my_font = "Roboto";
+
       new Frame(
         FIT,
         1800,
@@ -56,11 +58,15 @@
         darker,
         darker,
         ready,
-        "maneblo_logo.png",
+        [
+          "maneblo_logo.png",
+          `https://fonts.googleapis.com/css?family=${my_font}`,
+        ],
         "assets/"
       );
 
       async function ready() {
+        STYLE = { font: my_font };
         const front = new TextureActive({
           width: W,
           height: H,
@@ -209,7 +215,7 @@
 
           //List of all topics:
           var list = new List({
-            width: 220,
+            width: 214,
             height: 400,
             align: "left", // if aligned right indent should be 0 and labelIndent 10 (for center it does not matter)
             indent: 10, // otherwise when custom object is added the list takes on an outer indent
@@ -228,10 +234,13 @@
             rollBackgroundColor: "#4169E1".toAlpha(0.8),
             selectedBackgroundColor: "#4B0082",
             closeColor: white,
+            // collapse: true,
+            // collapseColor: white,
+            // collapsed: true,
 
             // boundary: new Boundary(5, 5, W - 215, H - 400 - 70), // height of List and other list
           })
-            .pos(285, 455, RIGHT, TOP, front)
+            .pos(280, 455, RIGHT, TOP, front)
             .sca(1.8)
             .change(function (e) {
               // prevTopicLists.push(list);
@@ -239,13 +248,14 @@
             });
 
           prevTopicLists.push(list);
+          list.animateTo(themen_nr_input.currentValue - 1);
 
           themen_nr_input.on("change", () => {
             zog("Topic Nr. changed...");
             list.selectedIndex = themen_nr_input.currentValue - 1;
-            themen_name_label.text = "...loading...";
-            S.update();
-            my_main();
+            // themen_name_label.text = "...loading...";
+            // S.update();
+            // my_main();
           });
 
           list.on("change", () => {
@@ -262,7 +272,7 @@
           let result_answers_strings = "";
 
           for (let key in answers) {
-            result_answers_strings += `${key}) ${answers[key]} \n`;
+            result_answers_strings += `${key}) ${answers[key]} \n\n`;
           }
 
           label_answers.text = result_answers_strings;
@@ -283,6 +293,7 @@
               bold: true,
               backgroundColor: "#4B0082",
               size: 80,
+              corner: 10,
             }).hov("#6AB04D");
             answerLabel.center(front).mov(xpos, 260);
 
@@ -369,7 +380,7 @@
         }).pos(20, 27, "center", null, front);
 
         let label_title = new Label({
-          text: "AI Quiz-Generator",
+          text: "A I   Q U I Z   G E N E R A T O R",
           align: "left",
           color: "white",
           bold: true,
