@@ -407,7 +407,14 @@
 
         new Pic("logos.png").center(backing).centerReg().sca(1.5);
 
-        //TextureActive.makeBacking(backing.width, backing.height).addTo(backing); // CANVAS WINDOW
+        let back_label = new Label({
+          text: "ZIM frontend with three.js connecting via FastAPI to Redis database and ChatGPT:",
+          color: white,
+        })
+          .pos(0, 100, CENTER, TOP, backing)
+          .centerReg()
+          .mov(0, -460)
+          .sca(1.2);
 
         const three = new Three({
           width: window.innerWidth,
