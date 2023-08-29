@@ -407,10 +407,10 @@
           color: black,
           corner: 20,
           animated: false,
-          interactive: false, //lagging when true...
+          interactive: true,
         }).addTo();
 
-        new Pic("logos.png").center(backing).centerReg().sca(1.5);
+        new Pic("logos.png").center(backing).centerReg().sca(1.5).noMouse();
 
         let back_label = new Label({
           text: "ZIM frontend with three.js connecting via FastAPIs to Redis database and ChatGPT:",
@@ -419,34 +419,41 @@
           .pos(0, 100, CENTER, TOP, backing)
           .centerReg()
           .mov(0, -460)
-          .sca(1.2);
+          .sca(1.2)
+          .noMouse();
 
         let link1_label = new Label({
           text: "https://github.com/ajerni/langchain-quiz-zim-frontend-three",
           color: white,
-        }).pos(60, 150, LEFT, BOTTOM, backing);
+        })
+          .pos(60, 150, LEFT, BOTTOM, backing)
+          .hov("#4169E1");
 
-        // link1_label.on("click", () => {
-        //   zgo("https://github.com/ajerni/langchain-quiz-zim-frontend-three");
-        // });
+        link1_label.on("click", () => {
+          zgo("https://github.com/ajerni/langchain-quiz-zim-frontend-three");
+        });
 
         let link2_label = new Label({
           text: "https://github.com/ajerni/fastapi-redis-crud",
           color: white,
-        }).pos(60, 100, LEFT, BOTTOM, backing);
+        })
+          .pos(60, 100, LEFT, BOTTOM, backing)
+          .hov("#4169E1");
 
-        // link2_label.on("click", () => {
-        //   zgo("https://github.com/ajerni/fastapi-redis-crud");
-        // });
+        link2_label.on("click", () => {
+          zgo("https://github.com/ajerni/fastapi-redis-crud");
+        });
 
         let link3_label = new Label({
           text: "https://github.com/ajerni/langchain-quiz-api",
           color: white,
-        }).pos(60, 50, LEFT, BOTTOM, backing);
+        })
+          .pos(60, 50, LEFT, BOTTOM, backing)
+          .hov("#4169E1");
 
-        // link3_label.on("click", () => {
-        //   zgo("https://github.com/ajerni/langchain-quiz-api");
-        // });
+        link3_label.on("click", () => {
+          zgo("https://github.com/ajerni/langchain-quiz-api");
+        });
 
         const three = new Three({
           width: window.innerWidth,
