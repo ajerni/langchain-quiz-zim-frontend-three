@@ -407,7 +407,7 @@
           color: black,
           corner: 20,
           animated: false,
-          interactive: false,
+          interactive: false, //lagging when true...
         }).addTo();
 
         new Pic("logos.png").center(backing).centerReg().sca(1.5);
@@ -422,7 +422,7 @@
           .sca(1.2);
 
         let link1_label = new Label({
-          text: "ZIM - Frontend: https://github.com/ajerni/langchain-quiz-zim-frontend-three",
+          text: "https://github.com/ajerni/langchain-quiz-zim-frontend-three",
           color: white,
         }).pos(60, 150, LEFT, BOTTOM, backing);
 
@@ -431,7 +431,7 @@
         // });
 
         let link2_label = new Label({
-          text: "FastAPI - Redis - CRUD operations: https://github.com/ajerni/fastapi-redis-crud",
+          text: "https://github.com/ajerni/fastapi-redis-crud",
           color: white,
         }).pos(60, 100, LEFT, BOTTOM, backing);
 
@@ -440,7 +440,7 @@
         // });
 
         let link3_label = new Label({
-          text: "FastAPI - ChatGPT - Quiz-Generator: https://github.com/ajerni/langchain-quiz-api",
+          text: "https://github.com/ajerni/langchain-quiz-api",
           color: white,
         }).pos(60, 50, LEFT, BOTTOM, backing);
 
