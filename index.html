@@ -58,10 +58,7 @@
         darker,
         darker,
         ready,
-        [
-          "maneblo_logo.png",
-          `https://fonts.googleapis.com/css?family=${my_font}`,
-        ],
+        ["logos.png", `https://fonts.googleapis.com/css?family=${my_font}`],
         "assets/"
       );
 
@@ -408,7 +405,7 @@
           interactive: false,
         }).addTo();
 
-        new Pic("maneblo_logo.png").center(backing);
+        new Pic("logos.png").center(backing).centerReg().sca(1.5);
 
         //TextureActive.makeBacking(backing.width, backing.height).addTo(backing); // CANVAS WINDOW
 
