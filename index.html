@@ -76,7 +76,7 @@
         let themen_name_label = new Label({
           text: "",
           color: white, //"#4B0082",
-        }).pos(430, 103, null, null, front);
+        }).pos(720, 103, null, null, front);
 
         let themen_nr_label = new Label({
           text: "Topic:",
@@ -90,10 +90,10 @@
           min: 1,
           max: 99,
           color: "#9A3C99",
-        }).pos(230, 91, null, null, front);
+        }).pos(320, 91, null, null, front);
 
         let frage_nr_label = new Label({
-          text: "Question:",
+          text: "Question (1-3):",
           color: "#9A3C99",
         }).pos(20, 175, null, null, front);
 
@@ -104,7 +104,7 @@
           min: 1,
           max: 3,
           color: "#9A3C99",
-        }).pos(230, 164, null, null, front);
+        }).pos(320, 164, null, null, front);
 
         let prevCorrLabels = [];
         let prevTopicLists = [];
@@ -126,14 +126,11 @@
           corner: 10,
         }).pos(110, 170, RIGHT, null, front);
 
-        // const waiter = new Waiter(front);
-
         function showChanges() {
           label_topic.text = "New topic generated!";
           label_topic.color = "green";
           input.text = "";
           label_topic.mov(90, 0);
-          // waiter.hide(front);
           S.update();
           my_main();
         }
@@ -142,7 +139,6 @@
           .pos(110, 250, RIGHT, null, front)
           .tap(async () => {
             zog(input.text);
-            // waiter.show();
             label_topic.text = "AI generating...";
             label_topic.color = red;
             await generateQuizset(input.text);
@@ -187,7 +183,7 @@
               parsed_quiz[frage_nr]["correct_answer"]
             ];
           let thema = quizzes["messages"][message_nr]["Value"]["topic"]; //ist eine Stufe höher im ersten JSON
-          themen_name_label.text = "Loaded: " + thema;
+          themen_name_label.text = "Loaded topic: " + thema;
 
           function getAllTopics() {
             const messages = quizzes["messages"];
@@ -252,9 +248,6 @@
           themen_nr_input.on("change", () => {
             zog("Topic Nr. changed...");
             list.selectedIndex = themen_nr_input.currentValue - 1;
-            // themen_name_label.text = "...loading...";
-            // S.update();
-            // my_main();
           });
 
           list.on("change", () => {
@@ -265,7 +258,7 @@
             my_main();
           });
 
-          //main labesl etc.
+          //main lables etc.
           label_question.text = question;
 
           let result_answers_strings = "";
@@ -357,6 +350,10 @@
           if (frage_nr_input.currentValue == 3) {
             button_next.vis(false);
           } else {
+            prevCorrLabels.forEach((label) => {
+              label.removeFrom(S.front);
+            });
+            prevCorrLabels = [];
             frage_nr_input.selectedIndex = frage_nr_input.selectedIndex + 1;
             themen_name_label.text = "...loading...";
             my_main();
@@ -368,6 +365,10 @@
           .tap(() => {
             themen_name_label.text = "...loading...";
             button_next.vis(true);
+            prevCorrLabels.forEach((label) => {
+              label.removeFrom(S.front);
+            });
+            prevCorrLabels = [];
             my_main();
           });
 
@@ -392,7 +393,7 @@
         let label_score = new Label({
           text: "Score: " + score,
           align: "center",
-          color: "#4169E1",
+          color: "#3eaf1f",
           size: 36,
           bold: true,
         })
