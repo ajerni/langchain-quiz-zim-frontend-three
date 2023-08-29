@@ -348,11 +348,26 @@
         }
 
         //part to fetch questions from Redis
-        //width, height, label, backgroundColor, rollBackgroundColor, downBackgroundColor, color, rollColor, downColor, borderColor, borderWidth
-        new Button(690, 60, "Load existing Question-Set", "#4169E1")
+
+        let button_next = new Button(345, 60, "Next question", "#4169E1")
+          .pos(720, 250, null, null, front)
+          .tap(checkQnr);
+
+        function checkQnr() {
+          if (frage_nr_input.currentValue == 3) {
+            button_next.vis(false);
+          } else {
+            frage_nr_input.selectedIndex = frage_nr_input.selectedIndex + 1;
+            themen_name_label.text = "...loading...";
+            my_main();
+          }
+        }
+
+        new Button(650, 60, "Load selected question", "#4169E1")
           .pos(20, 250, null, null, front)
           .tap(() => {
             themen_name_label.text = "...loading...";
+            button_next.vis(true);
             my_main();
           });
 
