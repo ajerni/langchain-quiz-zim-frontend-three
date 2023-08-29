@@ -407,10 +407,10 @@
           interactive: false,
         }).addTo();
 
-        new Pic("logos.png").center(backing).centerReg().sca(1.5);
+        new Pic("logos.png").center(backing).centerReg().sca(1.5).mov(0, 60);
 
         let back_label = new Label({
-          text: "ZIM frontend with three.js connecting via FastAPI to Redis database and ChatGPT:",
+          text: "ZIM frontend with three.js connecting via FastAPIs to Redis database and ChatGPT:",
           color: white,
         })
           .pos(0, 100, CENTER, TOP, backing)
