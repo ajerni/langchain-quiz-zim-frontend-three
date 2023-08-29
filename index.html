@@ -351,7 +351,10 @@
         //width, height, label, backgroundColor, rollBackgroundColor, downBackgroundColor, color, rollColor, downColor, borderColor, borderWidth
         new Button(690, 60, "Load Questions", "#4169E1")
           .pos(20, 250, null, null, front)
-          .tap(my_main);
+          .tap(() => {
+            themen_name_label.text = "...loading...";
+            my_main();
+          });
 
         let label_question = new Label({
           text: question,
@@ -407,7 +410,7 @@
           interactive: false,
         }).addTo();
 
-        new Pic("logos.png").center(backing).centerReg().sca(1.5).mov(0, 60);
+        new Pic("logos.png").center(backing).centerReg().sca(1.5);
 
         let back_label = new Label({
           text: "ZIM frontend with three.js connecting via FastAPIs to Redis database and ChatGPT:",
@@ -417,6 +420,33 @@
           .centerReg()
           .mov(0, -460)
           .sca(1.2);
+
+        let link1_label = new Label({
+          text: "ZIM - Frontend: https://github.com/ajerni/langchain-quiz-zim-frontend-three",
+          color: white,
+        }).pos(60, 150, LEFT, BOTTOM, backing);
+
+        // link1_label.on("click", () => {
+        //   zgo("https://github.com/ajerni/langchain-quiz-zim-frontend-three");
+        // });
+
+        let link2_label = new Label({
+          text: "FastAPI - Redis - CRUD operations: https://github.com/ajerni/fastapi-redis-crud",
+          color: white,
+        }).pos(60, 100, LEFT, BOTTOM, backing);
+
+        // link2_label.on("click", () => {
+        //   zgo("https://github.com/ajerni/fastapi-redis-crud");
+        // });
+
+        let link3_label = new Label({
+          text: "FastAPI - ChatGPT - Quiz-Generator: https://github.com/ajerni/langchain-quiz-api",
+          color: white,
+        }).pos(60, 50, LEFT, BOTTOM, backing);
+
+        // link3_label.on("click", () => {
+        //   zgo("https://github.com/ajerni/langchain-quiz-api");
+        // });
 
         const three = new Three({
           width: window.innerWidth,
