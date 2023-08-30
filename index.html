@@ -138,11 +138,16 @@
         new Button(385, 60, "generate new topic")
           .pos(110, 250, RIGHT, null, front)
           .tap(async () => {
-            zog(input.text);
-            label_topic.text = "AI generating...";
-            label_topic.color = red;
-            await generateQuizset(input.text);
-            showChanges();
+            if (zot(input.text) || input.text == "") {
+              zog("No topic entered.");
+              return;
+            } else {
+              zog(input.text);
+              label_topic.text = "AI generating...";
+              label_topic.color = red;
+              await generateQuizset(input.text);
+              showChanges();
+            }
           });
 
         input.on("focus", () => {
